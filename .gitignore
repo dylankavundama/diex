@@ -1,0 +1,35 @@
+# Fichiers de configuration sensibles
+config/database.php
+config/config.php
+
+# Dossiers uploads
+uploads/*
+!uploads/.gitkeep
+
+# Fichiers temporaires
+*.log
+*.tmp
+*.cache
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fichiers d'installation
+install.php
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+*~
+
+# Fichiers IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers de session
+sessions/
+
