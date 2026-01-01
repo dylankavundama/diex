@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AppColors {
   static const Color primaryBlue = Color(0xFF2563EB);
   static const Color primaryGreen = Color(0xFF10B981);
@@ -18,7 +20,7 @@ class AppConstants {
 }
 
 class AppStrings {
-  static const String appName = 'Diexo Mobile';
+  static const String appName = 'Dieu Agit';
   static const String login = 'Connexion';
   static const String logout = 'Déconnexion';
   static const String email = 'Email';
