@@ -11,7 +11,7 @@
       <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
       
     <application
-        android:label="Ituraa"
+        android:label="Dieu Agit"
           android:usesCleartextTraffic="false"
         android:name="${applicationName}"
          android:enableOnBackInvokedCallback="true"
