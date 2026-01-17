@@ -1,0 +1,96 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+body {
+  background-color: #eef2ef;
+}
+
+/* NAVBAR */
+.navbar {
+  background: white;
+  padding: 20px 40px;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 22px;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  height: 90vh;
+  background: url("https://via.placeholder.com/1600x900") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  padding: 60px;
+}
+
+.hero-content {
+  max-width: 500px;
+  color: white;
+}
+
+.hero-content h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.hero-content p {
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.hero-content button {
+  padding: 12px 24px;
+  border: none;
+  background: black;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* PRODUCT CARDS */
+.product-cards {
+  position: absolute;
+  right: 60px;
+  bottom: 60px;
+  display: flex;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 200px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+}
+
+.card-info {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}

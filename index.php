@@ -14,45 +14,44 @@ $featured_query = "SELECT p.*, c.nom as categorie_nom, u.nom as vendeur_nom
                    ORDER BY p.created_at DESC";
 $featured_result = $conn->query($featured_query);
 
-// Récupérer les catégories principales
-$categories_query = "SELECT * FROM categories WHERE parent_id IS NULL";
-$categories_result = $conn->query($categories_query);
+
 ?>
 
 <section class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <h1>Bienvenue sur <?php echo SITE_NAME; ?></h1>
-            <p>Découvrez notre large sélection de vêtements, articles ménagers et décoration intérieure</p>
-            <a href="shop.php" class="btn btn-primary">Découvrir la boutique</a>
+    <!-- Slider Background Layer -->
+    <!-- Static Background Image (Handled via CSS .hero) -->
+
+    <!-- Static Overlay Content (Direct Children of .hero for CSS compatibility) -->
+    <div class="hero-content">
+        <h1>EFFORTLESS STYLE,<br>TIMELESS ELEGANCE.</h1>
+        <p>Discover our latest collection of modern minimal fashion.</p>
+        <a href="shop.php"><button>Shop Now →</button></a>
+    </div>
+
+    <div class="product-cards">
+        <div class="card">
+            <img src="<?php echo SITE_URL; ?>/assets/images/header/a.avif" alt="Denim Jacket">
+            <div class="card-info">
+                <span>Denim Jacket</span>
+                <span>$54</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="<?php echo SITE_URL; ?>/assets/images/header/a.jpg" alt="Jacket">
+            <div class="card-info">
+                <span>Jacket</span>
+                <span>$84</span>
+            </div>
         </div>
     </div>
 </section>
 
-<section class="categories-section">
-    <div class="container">
-        <h2 class="section-title">Nos Catégories</h2>
-        <div class="categories-grid">
-            <?php while ($categorie = $categories_result->fetch_assoc()): ?>
-                <div class="category-card">
-                    <a href="shop.php?categorie=<?php echo $categorie['id']; ?>">
-                        <div class="category-icon">
-                            <i class="fas fa-<?php 
-                                echo $categorie['id'] == 1 ? 'tshirt' : ($categorie['id'] == 2 ? 'home' : 'couch'); 
-                            ?>"></i>
-                        </div>
-                        <h3><?php echo htmlspecialchars($categorie['nom']); ?></h3>
-                        <p><?php echo htmlspecialchars($categorie['description']); ?></p>
-                    </a>
-                </div>
-            <?php endwhile; ?>
-        </div>
-    </div>
-</section>
+
 
 <section class="featured-products">
     <div class="container">
-        <h2 class="section-title">Tous nos Produits</h2>
+        <h2 class="section-title">Tous nos produits</h2>
         <?php if ($featured_result->num_rows > 0): ?>
             <div class="products-grid">
                 <?php while ($product = $featured_result->fetch_assoc()): ?>

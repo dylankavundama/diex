@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: diexo-web
+    ports:
+      - "8080:80"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=diexo
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+
+  db:
+    image: mysql:8.0
+    container_name: diexo-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: diexo
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Initialize DB with existing SQL files
+      - ./database:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:

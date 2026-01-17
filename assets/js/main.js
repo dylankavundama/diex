@@ -1,16 +1,16 @@
 // Navigation mobile toggle
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
-    
+
     if (navToggle) {
-        navToggle.addEventListener('click', function() {
+        navToggle.addEventListener('click', function () {
             navMenu.classList.toggle('active');
         });
     }
-    
+
     // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (!navToggle.contains(event.target) && !navMenu.contains(event.target)) {
             navMenu.classList.remove('active');
         }
@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function initProductGallery() {
     const thumbnails = document.querySelectorAll('.product-thumbnail');
     const mainImage = document.querySelector('.product-main-image');
-    
+
     if (thumbnails.length > 0 && mainImage) {
         thumbnails.forEach(thumbnail => {
-            thumbnail.addEventListener('click', function() {
+            thumbnail.addEventListener('click', function () {
                 // Remove active class from all thumbnails
                 thumbnails.forEach(t => t.classList.remove('active'));
                 // Add active class to clicked thumbnail
@@ -42,9 +42,9 @@ document.addEventListener('DOMContentLoaded', initProductGallery);
 // Attribute selection
 function initAttributeSelection() {
     const attributeOptions = document.querySelectorAll('.attribute-option');
-    
+
     attributeOptions.forEach(option => {
-        option.addEventListener('click', function() {
+        option.addEventListener('click', function () {
             const group = this.closest('.attribute-group');
             const options = group.querySelectorAll('.attribute-option');
             options.forEach(opt => opt.classList.remove('selected'));
@@ -60,18 +60,18 @@ function sendWhatsAppOrder(productId, productName, price, quantity, attributes) 
     const phoneNumber = '221XXXXXXXX'; // Remplacer par le numéro réel
     let message = `Bonjour, je souhaite commander:\n\n`;
     message += `Produit: ${productName}\n`;
-    message += `Prix: $${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+    message += `Prix: $${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
     message += `Quantité: ${quantity}\n`;
-    
+
     if (attributes && attributes.length > 0) {
         message += `\nOptions:\n`;
         attributes.forEach(attr => {
             message += `- ${attr.type}: ${attr.value}\n`;
         });
     }
-    
+
     message += `\nMerci de me confirmer la disponibilité et les modalités de livraison.`;
-    
+
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
@@ -80,14 +80,14 @@ function sendWhatsAppOrder(productId, productName, price, quantity, attributes) 
 function initSearch() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             const productCards = document.querySelectorAll('.product-card');
-            
+
             productCards.forEach(card => {
                 const productName = card.querySelector('h3').textContent.toLowerCase();
                 const productCategory = card.querySelector('.product-category').textContent.toLowerCase();
-                
+
                 if (productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
                     card.style.display = 'block';
                 } else {
@@ -97,17 +97,27 @@ function initSearch() {
         });
     }
 }
+// Mobile Menu Toggle
+document.addEventListener('DOMContentLoaded', function () {
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
 
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', function () {
+            navMenu.classList.toggle('active');
+        });
+    }
+});
 document.addEventListener('DOMContentLoaded', initSearch);
 
 // Form validation
 function validateForm(formId) {
     const form = document.getElementById(formId);
     if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             const requiredFields = form.querySelectorAll('[required]');
             let isValid = true;
-            
+
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
                     isValid = false;
@@ -116,7 +126,7 @@ function validateForm(formId) {
                     field.classList.remove('error');
                 }
             });
-            
+
             if (!isValid) {
                 e.preventDefault();
                 alert('Veuillez remplir tous les champs obligatoires.');
@@ -126,7 +136,7 @@ function validateForm(formId) {
 }
 
 // Auto-hide alerts
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
         setTimeout(() => {
@@ -137,3 +147,58 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Hero Slider
+document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.querySelector('.prev-slide');
+    const nextBtn = document.querySelector('.next-slide');
+
+    if (slides.length > 0) {
+        let currentSlide = 0;
+
+        // Show specific slide
+        function showSlide(n) {
+            // Reset index if out of bounds
+            if (n >= slides.length) currentSlide = 0;
+            if (n < 0) currentSlide = slides.length - 1;
+
+            // Hide all slides
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Show current
+            slides[currentSlide].classList.add('active');
+            if (dots.length > 0) dots[currentSlide].classList.add('active');
+        }
+
+        // Next/Prev events
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                currentSlide++;
+                showSlide(currentSlide);
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                currentSlide--;
+                showSlide(currentSlide);
+            });
+        }
+
+        // Dot events
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                showSlide(currentSlide);
+            });
+        });
+
+        // Auto play (optional - 5 seconds)
+        setInterval(() => {
+            currentSlide++;
+            showSlide(currentSlide);
+        }, 8000);
+    }
+});
