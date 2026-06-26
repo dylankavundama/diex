@@ -2,7 +2,11 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3><?php echo SITE_NAME; ?></h3>
+                    <h3><?php echo SITE_NAME; ?>
+                
+                <div style="font-size: 0.5em; font-weight: 400; letter-spacing: 2px; margin-top: 2px; opacity: 0.7;">Chez Jodesie</div>
+                </h3>
+                    
                     <p>Votre boutique en ligne pour vêtements, articles ménagers et décoration intérieure.</p>
                 </div>
                 <div class="footer-section">
@@ -10,7 +14,7 @@
                     <ul>
                         <li><a href="<?php echo SITE_URL; ?>/index.php">Accueil</a></li>
                         <li><a href="<?php echo SITE_URL; ?>/shop.php">Boutique</a></li>
-                        <li><a href="<?php echo SITE_URL; ?>./admin/dashboard.php">Admin</a></li>
+                        <li><a href="<?php echo SITE_URL; ?>/admin/dashboard.php">Admin</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -23,9 +27,8 @@
                 </div>
                 <div class="footer-section">
                     <h4>Contact</h4>
-                    <p><i class="fas fa-phone"></i> +221 XX XXX XX XX</p>
-                    <p><i class="fas fa-envelope"></i> contact@diexo.com</p>
-                    <a href="https://wa.me/<?php echo WHATSAPP_NUMBER; ?>" class="whatsapp-btn" target="_blank">
+                    <p><i class="fas fa-phone"></i> <?php echo WHATSAPP_NUMBER; ?></p>
+                    <a href="<?php echo WHATSAPP_API_URL; ?>?phone=<?php echo WHATSAPP_NUMBER; ?>" class="whatsapp-btn" target="_blank">
                         <i class="fab fa-whatsapp"></i> WhatsApp
                     </a>
                 </div>
@@ -36,6 +39,7 @@
         </div>
     </footer>
     <script src="<?php echo SITE_URL; ?>/assets/js/main.js"></script>
+
 </body>
 </html>
 

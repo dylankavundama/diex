@@ -121,7 +121,7 @@ require_once 'includes/admin_header.php';
         </form>
     </div>
     
-    <div class="dashboard-stats">
+    <div class="stats-grid">
         <div class="stat-card success">
             <h3>Recettes</h3>
             <div class="stat-value"><?php echo formatPrice($report_data['recettes'] ?? 0); ?></div>
@@ -159,8 +159,8 @@ require_once 'includes/admin_header.php';
                     <?php if ($result->num_rows > 0): ?>
                         <?php while ($visit = $result->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo date('d/m/Y', strtotime($visit['date_visite'])); ?></td>
-                            <td><?php echo $visit['total']; ?></td>
+                            <td data-label="Date"><?php echo date('d/m/Y', strtotime($visit['date_visite'])); ?></td>
+                            <td data-label="Nombre de visites"><?php echo $visit['total']; ?></td>
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>

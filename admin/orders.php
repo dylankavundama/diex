@@ -49,11 +49,7 @@ require_once 'includes/admin_header.php';
     </div>
 <?php endif; ?>
 
-<div class="content-card" style="margin-bottom: 1.5rem;">
-    <div class="content-card-header">
-        <h2><i class="fas fa-filter"></i> Filtres</h2>
-    </div>
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <div class="page-actions" style="margin-bottom: 1.5rem;">
         <a href="?status=" class="btn btn-<?php echo empty($status_filter) ? 'primary' : 'secondary'; ?>">Toutes</a>
         <a href="?status=en_attente" class="btn btn-<?php echo $status_filter === 'en_attente' ? 'primary' : 'secondary'; ?>">En attente</a>
         <a href="?status=confirmee" class="btn btn-<?php echo $status_filter === 'confirmee' ? 'primary' : 'secondary'; ?>">Confirmées</a>
@@ -86,18 +82,18 @@ require_once 'includes/admin_header.php';
                     <?php if ($orders->num_rows > 0): ?>
                         <?php while ($order = $orders->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($order['numero_commande']); ?></td>
-                            <td><?php echo htmlspecialchars($order['nom'] . ' ' . $order['prenom']); ?></td>
-                            <td>
+                            <td data-label="N° Commande"><?php echo htmlspecialchars($order['numero_commande']); ?></td>
+                            <td data-label="Client"><?php echo htmlspecialchars($order['nom'] . ' ' . $order['prenom']); ?></td>
+                            <td data-label="Contact">
                                 <div><?php echo htmlspecialchars($order['email']); ?></div>
                                 <small><?php echo htmlspecialchars($order['telephone']); ?></small>
                             </td>
-                            <td><?php echo formatPrice($order['total']); ?></td>
-                            <td>
+                            <td data-label="Total"><?php echo formatPrice($order['total']); ?></td>
+                            <td data-label="Statut">
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
                                     <input type="hidden" name="action" value="update_status">
-                                    <select name="status" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 5px;">
+                                    <select name="status" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 5px; width: 100%;">
                                         <option value="en_attente" <?php echo $order['statut'] === 'en_attente' ? 'selected' : ''; ?>>En attente</option>
                                         <option value="confirmee" <?php echo $order['statut'] === 'confirmee' ? 'selected' : ''; ?>>Confirmée</option>
                                         <option value="en_preparation" <?php echo $order['statut'] === 'en_preparation' ? 'selected' : ''; ?>>En préparation</option>
@@ -107,9 +103,9 @@ require_once 'includes/admin_header.php';
                                     </select>
                                 </form>
                             </td>
-                            <td><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></td>
-                            <td>
-                                <a href="order_details.php?id=<?php echo $order['id']; ?>" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Détails</a>
+                            <td data-label="Date"><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></td>
+                            <td data-label="Actions">
+                                <a href="order_details.php?id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">Détails</a>
                             </td>
                         </tr>
                         <?php endwhile; ?>

@@ -59,9 +59,15 @@ if ($result->num_rows === 1) {
         // Retourner les données utilisateur (sans le mot de passe)
         unset($user['password']);
         
-        // Générer un token simple (vous pouvez utiliser JWT pour plus de sécurité)
+        // Générer un token simple
         $token = bin2hex(random_bytes(32));
         $_SESSION['api_token'] = $token;
+        
+        // Sauvegarder le token dans la base de données
+        $stmt_token = $conn->prepare("UPDATE users SET api_token = ? WHERE id = ?");
+        $stmt_token->bind_param("si", $token, $user['id']);
+        $stmt_token->execute();
+        $stmt_token->close();
         
         echo json_encode([
             'success' => true,

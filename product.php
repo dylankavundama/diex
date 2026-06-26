@@ -55,7 +55,9 @@ while ($attr = $attributes_result->fetch_assoc()) {
             <div class="product-images">
                 <img src="<?php echo $product['image_principale'] ? UPLOAD_URL . $product['image_principale'] : SITE_URL . '/assets/images/placeholder.jpg'; ?>" 
                      alt="<?php echo htmlspecialchars($product['nom']); ?>" 
-                     class="product-main-image" id="mainImage">
+                     class="product-main-image" id="mainImage" 
+                     onclick="openLightbox(this.src)" 
+                     style="cursor: zoom-in;">
                 
                 <?php if ($images_result->num_rows > 0): ?>
                     <div class="product-thumbnails">
@@ -76,14 +78,14 @@ while ($attr = $attributes_result->fetch_assoc()) {
             <div class="product-info-detail">
                 <h1><?php echo htmlspecialchars($product['nom']); ?></h1>
                 <p class="product-category"><?php echo htmlspecialchars($product['categorie_nom']); ?></p>
-                <p class="product-price-detail"><?php echo formatPrice($product['prix_vente']); ?></p>
+                <p class="product-price-detail"><?php echo formatPriceDual($product['prix_vente']); ?></p>
                 
                 <?php if ($product['stock'] > 0): ?>
-                    <p class="stock-info" style="color: var(--success-color); margin: 1rem 0;">
+                    <p class="stock-info stock-available">
                         <i class="fas fa-check-circle"></i> En stock (<?php echo $product['stock']; ?> disponibles)
                     </p>
                 <?php else: ?>
-                    <p class="stock-info" style="color: var(--accent-color); margin: 1rem 0;">
+                    <p class="stock-info stock-empty">
                         <i class="fas fa-times-circle"></i> Rupture de stock
                     </p>
                 <?php endif; ?>
@@ -113,15 +115,19 @@ while ($attr = $attributes_result->fetch_assoc()) {
                     </div>
                 <?php endif; ?>
                 
-                <div class="quantity-selector" style="margin: 2rem 0;">
+                <div class="quantity-selector">
                     <label for="quantity">Quantité:</label>
-                    <input type="number" id="quantity" name="quantity" min="1" max="<?php echo $product['stock']; ?>" value="1" style="width: 100px; padding: 0.5rem; margin-left: 1rem;">
+                    <input type="number" id="quantity" name="quantity" min="1" max="<?php echo $product['stock']; ?>" value="1">
                 </div>
                 
                 <?php if ($product['stock'] > 0): ?>
+                    <?php 
+                        $main_image_url = $product['image_principale'] ? UPLOAD_URL . $product['image_principale'] : SITE_URL . '/assets/images/placeholder.jpg';
+                        $product_url = SITE_URL . "/product.php?id=" . $product['id'];
+                    ?>
                     <a href="#" 
                        class="whatsapp-order-btn" 
-                       onclick="orderViaWhatsApp(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['nom'], ENT_QUOTES); ?>', <?php echo $product['prix_vente']; ?>); return false;">
+                       onclick="orderViaWhatsApp(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['nom'], ENT_QUOTES); ?>', <?php echo $product['prix_vente']; ?>, '<?php echo $main_image_url; ?>', '<?php echo $product_url; ?>'); return false;">
                         <i class="fab fa-whatsapp"></i> Commander via WhatsApp
                     </a>
                 <?php else: ?>
@@ -136,7 +142,12 @@ while ($attr = $attributes_result->fetch_assoc()) {
             </div>
         </div>
     </div>
-</section>
+<!-- Lightbox Modal -->
+<div id="productLightbox" class="lightbox-modal" onclick="closeLightbox()">
+    <span class="close-lightbox">&times;</span>
+    <img class="lightbox-content" id="lightboxImg">
+    <div id="lightbox-caption"></div>
+</div>
 
 <script>
 function changeMainImage(src) {
@@ -147,7 +158,7 @@ function changeMainImage(src) {
     event.target.classList.add('active');
 }
 
-function orderViaWhatsApp(productId, productName, price) {
+function orderViaWhatsApp(productId, productName, price, imageUrl, productUrl) {
     const quantity = document.getElementById('quantity').value;
     const selectedAttributes = [];
     
@@ -172,11 +183,43 @@ function orderViaWhatsApp(productId, productName, price) {
         });
     }
     
+    message += `\nLien du produit: ${productUrl}\n`;
+    message += `Image: ${imageUrl}\n`;
+    
     message += `\nMerci de me confirmer la disponibilité et les modalités de livraison.`;
     
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
+
+// Lightbox Logic
+function openLightbox(src) {
+    const modal = document.getElementById("productLightbox");
+    const modalImg = document.getElementById("lightboxImg");
+    const captionText = document.getElementById("lightbox-caption");
+    
+    modal.style.display = "block";
+    modalImg.src = src;
+    captionText.innerHTML = "<?php echo htmlspecialchars($product['nom']); ?>";
+    
+    // Prevent scrolling
+    document.body.style.overflow = "hidden";
+}
+
+function closeLightbox() {
+    const modal = document.getElementById("productLightbox");
+    modal.style.display = "none";
+    
+    // Restore scrolling
+    document.body.style.overflow = "auto";
+}
+
+// Close on escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        closeLightbox();
+    }
+});
 </script>
 
 <?php

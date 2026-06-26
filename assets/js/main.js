@@ -2,62 +2,27 @@
 document.addEventListener('DOMContentLoaded', function () {
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
+    const navMenuRight = document.getElementById('navMenuRight');
 
     if (navToggle) {
         navToggle.addEventListener('click', function () {
-            navMenu.classList.toggle('active');
+            if (navMenu) navMenu.classList.toggle('active');
+            if (navMenuRight) navMenuRight.classList.toggle('active');
         });
     }
 
     // Close mobile menu when clicking outside
     document.addEventListener('click', function (event) {
-        if (!navToggle.contains(event.target) && !navMenu.contains(event.target)) {
+        if (navToggle && navMenu && !navToggle.contains(event.target) && !navMenu.contains(event.target)) {
             navMenu.classList.remove('active');
+            if (navMenuRight) navMenuRight.classList.remove('active');
         }
     });
 });
 
-// Product image gallery
-function initProductGallery() {
-    const thumbnails = document.querySelectorAll('.product-thumbnail');
-    const mainImage = document.querySelector('.product-main-image');
-
-    if (thumbnails.length > 0 && mainImage) {
-        thumbnails.forEach(thumbnail => {
-            thumbnail.addEventListener('click', function () {
-                // Remove active class from all thumbnails
-                thumbnails.forEach(t => t.classList.remove('active'));
-                // Add active class to clicked thumbnail
-                this.classList.add('active');
-                // Update main image
-                mainImage.src = this.src.replace('thumb_', '');
-            });
-        });
-    }
-}
-
-// Initialize product gallery on page load
-document.addEventListener('DOMContentLoaded', initProductGallery);
-
-// Attribute selection
-function initAttributeSelection() {
-    const attributeOptions = document.querySelectorAll('.attribute-option');
-
-    attributeOptions.forEach(option => {
-        option.addEventListener('click', function () {
-            const group = this.closest('.attribute-group');
-            const options = group.querySelectorAll('.attribute-option');
-            options.forEach(opt => opt.classList.remove('selected'));
-            this.classList.add('selected');
-        });
-    });
-}
-
-document.addEventListener('DOMContentLoaded', initAttributeSelection);
-
 // WhatsApp order function
 function sendWhatsAppOrder(productId, productName, price, quantity, attributes) {
-    const phoneNumber = '221XXXXXXXX'; // Remplacer par le numéro réel
+    const phoneNumber = '+243975950972'; // Numéro WhatsApp mis à jour
     let message = `Bonjour, je souhaite commander:\n\n`;
     message += `Produit: ${productName}\n`;
     message += `Prix: $${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
@@ -75,40 +40,6 @@ function sendWhatsAppOrder(productId, productName, price, quantity, attributes) 
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
-
-// Search functionality
-function initSearch() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
-            const productCards = document.querySelectorAll('.product-card');
-
-            productCards.forEach(card => {
-                const productName = card.querySelector('h3').textContent.toLowerCase();
-                const productCategory = card.querySelector('.product-category').textContent.toLowerCase();
-
-                if (productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    }
-}
-// Mobile Menu Toggle
-document.addEventListener('DOMContentLoaded', function () {
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
-
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function () {
-            navMenu.classList.toggle('active');
-        });
-    }
-});
-document.addEventListener('DOMContentLoaded', initSearch);
 
 // Form validation
 function validateForm(formId) {

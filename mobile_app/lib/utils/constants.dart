@@ -11,11 +11,11 @@ class AppColors {
 }
 
 class AppConstants {
-  // Modifier selon votre configuration
-  static const String baseUrl = 'http://localhost/diexo';
+  // CRITICAL: Change this to your production URL before deployment (e.g., https://votre-site.com)
+  static const String baseUrl = 'https://boutiquedieuagit.com';
   static const String apiUrl = '$baseUrl/api';
-  
-  // Taux de change USD vers CDF
+
+  // Taux de change USD vers CDF (Note: Ideally fetch this from API)
   static const double usdToCdfRate = 2200.0;
 }
 
@@ -28,4 +28,3 @@ class AppStrings {
   static const String loginError = 'Erreur de connexion';
   static const String invalidCredentials = 'Identifiants invalides';
 }
-

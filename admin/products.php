@@ -1,7 +1,7 @@
 <?php
 $page_title = "Gestion des Produits";
-require_once '../config/config.php';
-require_once '../config/database.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/database.php';
 requireRole(ROLE_ADMIN);
 
 $conn = getDBConnection();
@@ -12,21 +12,37 @@ $message_type = '';
 if (isset($_GET['action'])) {
     if ($_GET['action'] === 'delete' && isset($_GET['id'])) {
         $id = (int)$_GET['id'];
-        $stmt = $conn->prepare("UPDATE products SET statut = 'inactif' WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        if ($stmt->execute()) {
-            $message = 'Produit supprimé avec succès.';
-            $message_type = 'success';
+        
+        // Vérifier s'il y a des commandes liées à ce produit
+        $check_orders = $conn->query("SELECT id FROM order_items WHERE product_id = $id LIMIT 1");
+        
+        if ($check_orders->num_rows > 0) {
+            // S'il y a des commandes, on fait un soft-delete
+            $stmt = $conn->prepare("UPDATE products SET statut = 'inactif' WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                $message = 'Le produit a été archivé car il possède des commandes liées.';
+                $message_type = 'success';
+            }
+        } else {
+            // S'il n'y a pas de commandes, on peut faire un vrai delete
+            $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                $message = 'Produit supprimé définitivement avec succès.';
+                $message_type = 'success';
+            }
         }
-        $stmt->close();
+        if (isset($stmt)) $stmt->close();
     }
 }
 
-// Récupérer tous les produits
+// Récupérer tous les produits (sauf les inactifs si on veut les cacher)
 $products = $conn->query("SELECT p.*, c.nom as categorie_nom, u.nom as vendeur_nom 
                           FROM products p 
                           LEFT JOIN categories c ON p.categorie_id = c.id 
                           LEFT JOIN users u ON p.vendeur_id = u.id 
+                          WHERE p.statut != 'inactif'
                           ORDER BY p.created_at DESC");
 
 require_once 'includes/admin_header.php';
@@ -68,8 +84,8 @@ require_once 'includes/admin_header.php';
                     <?php if ($products->num_rows > 0): ?>
                         <?php while ($product = $products->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo $product['id']; ?></td>
-                            <td>
+                            <td data-label="ID"><?php echo $product['id']; ?></td>
+                            <td data-label="Image">
                                 <?php if ($product['image_principale']): ?>
                                     <img src="<?php echo UPLOAD_URL . $product['image_principale']; ?>" 
                                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
@@ -77,17 +93,17 @@ require_once 'includes/admin_header.php';
                                     <span style="color: #999;">Pas d'image</span>
                                 <?php endif; ?>
                             </td>
-                            <td><?php echo htmlspecialchars($product['nom']); ?></td>
-                            <td><?php echo htmlspecialchars($product['categorie_nom']); ?></td>
-                            <td><?php echo formatPrice($product['prix_achat']); ?></td>
-                            <td><?php echo formatPrice($product['prix_vente']); ?></td>
-                            <td>
+                            <td data-label="Nom"><?php echo htmlspecialchars($product['nom']); ?></td>
+                            <td data-label="Catégorie"><?php echo htmlspecialchars($product['categorie_nom']); ?></td>
+                            <td data-label="Prix d'achat"><?php echo formatPrice($product['prix_achat']); ?></td>
+                            <td data-label="Prix de vente"><?php echo formatPrice($product['prix_vente']); ?></td>
+                            <td data-label="Stock">
                                 <span style="color: <?php echo $product['stock'] <= $product['stock_minimum'] ? 'var(--accent-color)' : 'var(--success-color)'; ?>; font-weight: bold;">
                                     <?php echo $product['stock']; ?>
                                 </span>
                             </td>
-                            <td><?php echo $product['vendeur_nom'] ? htmlspecialchars($product['vendeur_nom']) : 'Admin'; ?></td>
-                            <td>
+                            <td data-label="Vendeur"><?php echo $product['vendeur_nom'] ? htmlspecialchars($product['vendeur_nom']) : 'Admin'; ?></td>
+                            <td data-label="Statut">
                                 <span class="badge badge-<?php 
                                     echo $product['statut'] == 'actif' ? 'success' : 
                                         ($product['statut'] == 'rupture' ? 'warning' : '');
@@ -95,11 +111,10 @@ require_once 'includes/admin_header.php';
                                     <?php echo ucfirst($product['statut']); ?>
                                 </span>
                             </td>
-                            <td>
-                                <a href="product_edit.php?id=<?php echo $product['id']; ?>" class="btn btn-warning" style="padding: 0.5rem 1rem; font-size: 0.9rem; margin-right: 0.5rem;">Modifier</a>
+                            <td data-label="Actions">
+                                <a href="product_edit.php?id=<?php echo $product['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
                                 <a href="?action=delete&id=<?php echo $product['id']; ?>" 
-                                   class="btn btn-danger" 
-                                   style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+                                   class="btn btn-danger btn-sm" 
                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">Supprimer</a>
                             </td>
                         </tr>

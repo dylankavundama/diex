@@ -81,580 +81,263 @@ $sales_last_7_days = $conn->query("SELECT DATE(created_at) as date, COUNT(*) as 
                                     AND statut != 'annulee'
                                     GROUP BY DATE(created_at) 
                                     ORDER BY date ASC");
+
+require_once 'includes/admin_header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?> - <?php echo SITE_NAME; ?></title>
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-            background: #f5f7fa;
-        }
-        
-        .admin-sidebar {
-            width: 260px;
-            background: #2c3e50;
-            color: white;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-        
-        .admin-sidebar-header {
-            padding: 1.5rem;
-            background: #1a252f;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .admin-sidebar-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: white;
-        }
-        
-        .admin-sidebar-header p {
-            margin: 0.5rem 0 0 0;
-            color: #bdc3c7;
-            font-size: 0.9rem;
-        }
-        
-        .admin-menu {
-            padding: 1rem 0;
-        }
-        
-        .admin-menu-item {
-            display: block;
-            padding: 1rem 1.5rem;
-            color: #ecf0f1;
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-        
-        .admin-menu-item:hover,
-        .admin-menu-item.active {
-            background: #34495e;
-            border-left-color: #3498db;
-            color: white;
-        }
-        
-        .admin-menu-item i {
-            width: 20px;
-            margin-right: 0.75rem;
-        }
-        
-        .admin-content {
-            flex: 1;
-            margin-left: 260px;
-            padding: 0;
-        }
-        
-        .admin-header {
-            background: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .admin-header h1 {
-            margin: 0;
-            font-size: 1.75rem;
-            color: #2c3e50;
-        }
-        
-        .admin-user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .admin-user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .admin-main-content {
-            padding: 2rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card-modern {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            border-left: 4px solid #3498db;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .stat-card-modern:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-        
-        .stat-card-modern.success {
-            border-left-color: #27ae60;
-        }
-        
-        .stat-card-modern.warning {
-            border-left-color: #f39c12;
-        }
-        
-        .stat-card-modern.danger {
-            border-left-color: #e74c3c;
-        }
-        
-        .stat-card-modern .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            background: rgba(52, 152, 219, 0.1);
-            color: #3498db;
-        }
-        
-        .stat-card-modern.success .stat-icon {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
-        }
-        
-        .stat-card-modern.warning .stat-icon {
-            background: rgba(243, 156, 18, 0.1);
-            color: #f39c12;
-        }
-        
-        .stat-card-modern.danger .stat-icon {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-        }
-        
-        .stat-card-modern h3 {
-            margin: 0 0 0.5rem 0;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-        
-        .stat-card-modern .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 0;
-        }
-        
-        .stat-card-modern .stat-change {
-            margin-top: 0.5rem;
-            font-size: 0.85rem;
-            color: #95a5a6;
-        }
-        
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .content-card {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        .content-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #ecf0f1;
-        }
-        
-        .content-card-header h2 {
-            margin: 0;
-            font-size: 1.25rem;
-            color: #2c3e50;
-        }
-        
-        .table-modern {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .table-modern thead {
-            background: #f8f9fa;
-        }
-        
-        .table-modern th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-        }
-        
-        .table-modern td {
-            padding: 1rem;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        
-        .table-modern tbody tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: #2c3e50;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        @media (max-width: 768px) {
-            .admin-sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .admin-sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .admin-content {
-                margin-left: 0;
-            }
-            
-            .mobile-menu-toggle {
-                display: block;
-            }
-            
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar" id="adminSidebar">
-            <div class="admin-sidebar-header">
-                <h2><i class="fas fa-shopping-bag"></i> <?php echo SITE_NAME; ?></h2>
-                <p>Administration</p>
+
+<?php include 'dashboard_premium_styles.php'; ?>
+
+<!-- Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card-premium purple">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Produits</h3>
+                <div class="stat-value"><?php echo $stats['total_products']; ?></div>
+</div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-box"></i>
             </div>
-            
-            <nav class="admin-menu">
-                <a href="dashboard.php" class="admin-menu-item active">
-                    <i class="fas fa-home"></i> Tableau de bord
-                </a>
-                <a href="products.php" class="admin-menu-item">
-                    <i class="fas fa-box"></i> Produits
-                </a>
-                <a href="orders.php" class="admin-menu-item">
-                    <i class="fas fa-shopping-cart"></i> Commandes
-                </a>
-                <a href="users.php" class="admin-menu-item">
-                    <i class="fas fa-users"></i> Utilisateurs
-                </a>
-                <a href="financial.php" class="admin-menu-item">
-                    <i class="fas fa-dollar-sign"></i> Finances
-                </a>
-                <a href="reports.php" class="admin-menu-item">
-                    <i class="fas fa-chart-bar"></i> Rapports
-                </a>
-                <a href="<?php echo SITE_URL; ?>/index.php" class="admin-menu-item">
-                    <i class="fas fa-store"></i> Voir le site
-                </a>
-                <a href="<?php echo SITE_URL; ?>/auth/logout.php" class="admin-menu-item">
-                    <i class="fas fa-sign-out-alt"></i> Déconnexion
-                </a>
-            </nav>
-        </aside>
-        
-        <!-- Main Content -->
-        <div class="admin-content">
-            <!-- Header -->
-            <header class="admin-header">
-                <div>
-                    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1>Tableau de bord</h1>
-                </div>
-                <div class="admin-user-info">
-                    <div style="text-align: right; margin-right: 1rem;">
-                        <div style="font-weight: 600; color: #2c3e50;"><?php echo htmlspecialchars($_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom']); ?></div>
-                        <div style="font-size: 0.85rem; color: #7f8c8d;">Administrateur</div>
-                    </div>
-                    <div class="admin-user-avatar">
-                        <?php echo strtoupper(substr($_SESSION['user_nom'], 0, 1)); ?>
-                    </div>
-                </div>
-            </header>
-            
-            <!-- Main Content Area -->
-            <main class="admin-main-content">
-                <!-- Statistics Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card-modern">
-                        <div class="stat-icon">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <h3>Produits</h3>
-                        <div class="stat-value"><?php echo $stats['total_products']; ?></div>
-                        <div class="stat-change">
-                            <i class="fas fa-cubes" style="color: #3498db;"></i> Total stock: <?php echo number_format($stats['total_stock'], 0, ',', ' '); ?> unités | 
-                            <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i> <?php echo $stats['low_stock']; ?> en stock faible
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card-modern success">
-                        <div class="stat-icon">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <h3>Chiffre d'affaires</h3>
-                        <div class="stat-value"><?php echo formatPrice($stats['monthly_revenue']); ?></div>
-                        <div class="stat-change">Ce mois</div>
-                    </div>
-                    
-                    <div class="stat-card-modern success">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h3>Bénéfice</h3>
-                        <div class="stat-value"><?php echo formatPrice($stats['monthly_profit']); ?></div>
-                        <div class="stat-change">Ce mois</div>
-                    </div>
-                    
-                    <div class="stat-card-modern">
-                        <div class="stat-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <h3>Commandes</h3>
-                        <div class="stat-value"><?php echo $stats['total_orders']; ?></div>
-                        <div class="stat-change">
-                            <i class="fas fa-clock" style="color: #f39c12;"></i> <?php echo $stats['pending_orders']; ?> en attente
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card-modern">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3>Clients</h3>
-                        <div class="stat-value"><?php echo $stats['total_clients']; ?></div>
-                        <div class="stat-change">Total clients</div>
-                    </div>
-                    
-                    <div class="stat-card-modern warning">
-                        <div class="stat-icon">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <h3>Dettes</h3>
-                        <div class="stat-value"><?php echo formatPrice($stats['total_debts']); ?></div>
-                        <div class="stat-change">À recouvrer</div>
-                    </div>
-                    
-                    <div class="stat-card-modern">
-                        <div class="stat-icon">
-                            <i class="fas fa-cubes"></i>
-                        </div>
-                        <h3>Total Stock</h3>
-                        <div class="stat-value"><?php echo formatPrice($stats['total_stock_value']); ?></div>
-                        <div class="stat-change">Valeur du stock</div>
-                    </div>
-                    
-                    <div class="stat-card-modern <?php echo $stats['cash_balance'] >= 0 ? 'success' : 'danger'; ?>">
-                        <div class="stat-icon">
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                        <h3>Caisse</h3>
-                        <div class="stat-value"><?php echo formatPrice($stats['cash_balance']); ?></div>
-                        <div class="stat-change">Solde disponible</div>
-                    </div>
-                </div>
-                
-                <!-- Content Grid -->
-                <div class="content-grid">
-                    <!-- Recent Orders -->
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <h2><i class="fas fa-shopping-cart"></i> Commandes récentes</h2>
-                            <a href="orders.php" style="color: #3498db; text-decoration: none; font-size: 0.9rem;">Voir tout →</a>
-                        </div>
-                        <div style="overflow-x: auto;">
-                            <table class="table-modern">
-                                <thead>
-                                    <tr>
-                                        <th>N° Commande</th>
-                                        <th>Client</th>
-                                        <th>Total</th>
-                                        <th>Statut</th>
-                                        <th>Date</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if ($recent_orders->num_rows > 0): ?>
-                                        <?php while ($order = $recent_orders->fetch_assoc()): ?>
-                                            <tr>
-                                                <td><strong><?php echo htmlspecialchars($order['numero_commande']); ?></strong></td>
-                                                <td><?php echo htmlspecialchars($order['nom'] . ' ' . $order['prenom']); ?></td>
-                                                <td><strong><?php echo formatPrice($order['total']); ?></strong></td>
-                                                <td>
-                                                    <span class="badge badge-<?php 
-                                                        echo $order['statut'] == 'livree' ? 'success' : 
-                                                            ($order['statut'] == 'en_attente' ? 'warning' : '');
-                                                    ?>">
-                                                        <?php echo ucfirst(str_replace('_', ' ', $order['statut'])); ?>
-                                                    </span>
-                                                </td>
-                                                <td><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></td>
-                                                <td>
-                                                    <a href="order_details.php?id=<?php echo $order['id']; ?>" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
-                                                        <i class="fas fa-eye"></i> Voir
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    <?php else: ?>
-                                        <tr>
-                                            <td colspan="6" style="text-align: center; padding: 2rem; color: #7f8c8d;">
-                                                Aucune commande récente
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <!-- Low Stock Products -->
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <h2><i class="fas fa-exclamation-triangle"></i> Stock faible</h2>
-                            <a href="products.php" style="color: #3498db; text-decoration: none; font-size: 0.9rem;">Voir tout →</a>
-                        </div>
-                        <div style="overflow-x: auto;">
-                            <table class="table-modern">
-                                <thead>
-                                    <tr>
-                                        <th>Produit</th>
-                                        <th>Stock</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if ($low_stock_products->num_rows > 0): ?>
-                                        <?php while ($product = $low_stock_products->fetch_assoc()): ?>
-                                            <tr>
-                                                <td><strong><?php echo htmlspecialchars($product['nom']); ?></strong></td>
-                                                <td>
-                                                    <span style="color: #e74c3c; font-weight: bold;">
-                                                        <?php echo $product['stock']; ?> / <?php echo $product['stock_minimum']; ?>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <a href="products.php?action=edit&id=<?php echo $product['id']; ?>" class="btn btn-warning" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
-                                                        <i class="fas fa-edit"></i> Modifier
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    <?php else: ?>
-                                        <tr>
-                                            <td colspan="3" style="text-align: center; padding: 2rem; color: #7f8c8d;">
-                                                Tous les stocks sont suffisants
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Quick Actions -->
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <h2><i class="fas fa-bolt"></i> Actions rapides</h2>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <a href="product_add.php" class="btn btn-primary" style="text-align: center; padding: 1rem;">
-                            <i class="fas fa-plus"></i><br>Ajouter un produit
-                        </a>
-                        <a href="create_order.php" class="btn btn-success" style="text-align: center; padding: 1rem;">
-                            <i class="fas fa-shopping-cart"></i><br>Créer une commande
-                        </a>
-                        <a href="users.php" class="btn btn-secondary" style="text-align: center; padding: 1rem;">
-                            <i class="fas fa-user-plus"></i><br>Ajouter un utilisateur
-                        </a>
-                        <a href="reports.php" class="btn btn-secondary" style="text-align: center; padding: 1rem;">
-                            <i class="fas fa-file-alt"></i><br>Générer un rapport
-                        </a>
-                    </div>
-                </div>
-            </main>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-cubes"></i> <?php echo number_format($stats['total_stock'], 0, ',', ' '); ?> unités en stock
         </div>
     </div>
     
-    <script>
-        function toggleSidebar() {
-            document.getElementById('adminSidebar').classList.toggle('active');
-        }
-        
-        // Fermer la sidebar en cliquant à l'extérieur sur mobile
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('adminSidebar');
-            const toggle = document.querySelector('.mobile-menu-toggle');
-            
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(event.target) && !toggle.contains(event.target) && sidebar.classList.contains('active')) {
-                    sidebar.classList.remove('active');
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+    <div class="stat-card-premium green">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Chiffre d'affaires</h3>
+                <div class="stat-value"><?php echo formatPrice($stats['monthly_revenue']); ?></div>
+            </div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-calendar-alt"></i> Ce mois
+        </div>
+    </div>
+    
+    <div class="stat-card-premium orange">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Bénéfice</h3>
+                <div class="stat-value"><?php echo formatPrice($stats['monthly_profit']); ?></div>
+            </div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-trending-up"></i> Ce mois
+        </div>
+    </div>
+    
+    <div class="stat-card-premium blue">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Commandes</h3>
+                <div class="stat-value"><?php echo $stats['total_orders']; ?></div>
+            </div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-clock" style="color: #f39c12;"></i> <?php echo $stats['pending_orders']; ?> en attente
+        </div>
+    </div>
+    
+    <div class="stat-card-premium purple">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Clients</h3>
+                <div class="stat-value"><?php echo $stats['total_clients']; ?></div>
+            </div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-user-tie"></i> <?php echo $stats['total_vendeurs']; ?> vendeurs
+        </div>
+    </div>
+    
+    <div class="stat-card-premium yellow">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Dettes</h3>
+                <div class="stat-value"><?php echo formatPrice($stats['total_debts']); ?></div>
+            </div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-hand-holding-usd"></i> À recouvrer
+        </div>
+    </div>
+    
+    <div class="stat-card-premium blue">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Valeur Stock</h3>
+                <div class="stat-value"><?php echo formatPrice($stats['total_stock_value']); ?></div>
+            </div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-cubes"></i>
+            </div>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-warehouse"></i> Total inventaire
+        </div>
+    </div>
+    
+    <div class="stat-card-premium <?php echo $stats['cash_balance'] >= 0 ? 'green' : 'red'; ?>">
+        <div class="stat-header">
+            <div class="stat-info">
+                <h3>Caisse</h3>
+                <div class="stat-value"><?php echo formatPrice($stats['cash_balance']); ?></div>
+            </div>
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-wallet"></i>
+            </div>
+        </div>
+        <div class="stat-change">
+            <i class="fas fa-money-bill-wave"></i> Solde disponible
+        </div>
+    </div>
+</div>
+
+<!-- Content Grid -->
+<div class="content-grid-premium">
+    <!-- Recent Orders -->
+    <div class="content-card-premium">
+        <div class="content-header">
+            <h2><i class="fas fa-shopping-cart"></i> Commandes récentes</h2>
+            <a href="orders.php">Voir tout →</a>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="table-premium">
+                <thead>
+                    <tr>
+                        <th>N° Commande</th>
+                        <th>Client</th>
+                        <th>Total</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($recent_orders->num_rows > 0): ?>
+                        <?php while ($order = $recent_orders->fetch_assoc()): ?>
+                            <tr>
+                                <td data-label="N° Commande"><strong><?php echo htmlspecialchars($order['numero_commande']); ?></strong></td>
+                                <td data-label="Client"><?php echo htmlspecialchars($order['nom'] . ' ' . $order['prenom']); ?></td>
+                                <td data-label="Total"><strong><?php echo formatPrice($order['total']); ?></strong></td>
+                                <td data-label="Statut">
+                                    <span class="badge-premium <?php 
+                                        echo $order['statut'] == 'livree' ? 'success' : 
+                                            ($order['statut'] == 'en_attente' ? 'warning' : 'info');
+                                    ?>">
+                                        <?php echo ucfirst(str_replace('_', ' ', $order['statut'])); ?>
+                                    </span>
+                                </td>
+                                <td data-label="Date"><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></td>
+                                <td data-label="Action">
+                                    <a href="order_details.php?id=<?php echo $order['id']; ?>" class="btn-premium primary">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                                <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                                Aucune commande récente
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Low Stock Products -->
+    <div class="content-card-premium">
+        <div class="content-header">
+            <h2><i class="fas fa-exclamation-triangle"></i> Stock faible</h2>
+            <a href="products.php">Voir tout →</a>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="table-premium">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Stock</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($low_stock_products->num_rows > 0): ?>
+                        <?php while ($product = $low_stock_products->fetch_assoc()): ?>
+                            <tr>
+                                <td data-label="Produit"><strong><?php echo htmlspecialchars($product['nom']); ?></strong></td>
+                                <td data-label="Stock">
+                                    <span style="color: #e74c3c; font-weight: bold;">
+                                        <?php echo $product['stock']; ?> / <?php echo $product['stock_minimum']; ?>
+                                    </span>
+                                </td>
+                                <td data-label="Action">
+                                    <a href="products.php?action=edit&id=<?php echo $product['id']; ?>" class="btn-premium warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 2rem; color: #7f8c8d;">
+                                <i class="fas fa-check-circle" style="font-size: 2rem; color: #27ae60; margin-bottom: 0.5rem; display: block;"></i>
+                                Tous les stocks sont suffisants
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="content-card-premium">
+    <div class="content-header">
+        <h2><i class="fas fa-bolt"></i> Actions rapides</h2>
+    </div>
+    <div class="quick-actions-grid">
+        <a href="product_add.php" class="btn-premium primary quick-action-btn">
+            <i class="fas fa-plus"></i>
+            Ajouter un produit
+        </a>
+        <a href="create_order.php" class="btn-premium success quick-action-btn">
+            <i class="fas fa-shopping-cart"></i>
+            Créer une commande
+        </a>
+        <a href="users.php" class="btn-premium warning quick-action-btn">
+            <i class="fas fa-user-plus"></i>
+            Ajouter un utilisateur
+        </a>
+        <a href="reports.php" class="btn-premium primary quick-action-btn">
+            <i class="fas fa-file-alt"></i>
+            Générer un rapport
+        </a>
+    </div>
+</div>
 
 <?php
+require_once 'includes/admin_footer.php';
 $conn->close();
 ?>

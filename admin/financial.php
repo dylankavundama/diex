@@ -181,7 +181,7 @@ require_once 'includes/admin_header.php';
         </button>
     </div>
     
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+    <div class="grid-2" style="margin-top: 2rem;">
         <div class="content-card">
             <div class="content-card-header">
                 <h2><i class="fas fa-exclamation-circle"></i> Dettes des clients</h2>
@@ -202,18 +202,17 @@ require_once 'includes/admin_header.php';
                         <?php if ($debts->num_rows > 0): ?>
                             <?php while ($debt = $debts->fetch_assoc()): ?>
                             <tr>
-                                <td>
+                                <td data-label="Client">
                                     <div><?php echo htmlspecialchars($debt['nom'] . ' ' . $debt['prenom']); ?></div>
                                     <small><?php echo htmlspecialchars($debt['telephone']); ?></small>
                                 </td>
-                                <td><?php echo htmlspecialchars($debt['numero_commande'] ?? 'N/A'); ?></td>
-                                <td><?php echo formatPrice($debt['montant_total']); ?></td>
-                                <td><?php echo formatPrice($debt['montant_paye']); ?></td>
-                                <td style="color: var(--accent-color); font-weight: bold;"><?php echo formatPrice($debt['montant_restant']); ?></td>
-                                <td>
+                                <td data-label="Commande"><?php echo htmlspecialchars($debt['numero_commande'] ?? 'N/A'); ?></td>
+                                <td data-label="Montant total"><?php echo formatPrice($debt['montant_total']); ?></td>
+                                <td data-label="Payé"><?php echo formatPrice($debt['montant_paye']); ?></td>
+                                <td data-label="Restant" style="color: var(--accent-color); font-weight: bold;"><?php echo formatPrice($debt['montant_restant']); ?></td>
+                                <td data-label="Actions">
                                     <button onclick="openPaymentModal(<?php echo $debt['id']; ?>, <?php echo $debt['montant_restant']; ?>)" 
-                                            class="btn btn-success" 
-                                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                            class="btn btn-success btn-sm">
                                         Payer
                                     </button>
                                 </td>
@@ -252,8 +251,8 @@ require_once 'includes/admin_header.php';
                         <?php if ($recent_payments->num_rows > 0): ?>
                             <?php while ($payment = $recent_payments->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo date('d/m/Y H:i', strtotime($payment['created_at'])); ?></td>
-                                <td>
+                                <td data-label="Date"><?php echo date('d/m/Y H:i', strtotime($payment['created_at'])); ?></td>
+                                <td data-label="Client/Utilisateur">
                                     <?php if ($payment['type_paiement'] === 'sortie'): ?>
                                         <span style="color: #7f8c8d; font-size: 0.85rem;">
                                             <i class="fas fa-user"></i> <?php echo $payment['nom'] ? htmlspecialchars($payment['nom'] . ' ' . $payment['prenom']) : 'Utilisateur inconnu'; ?>
@@ -262,16 +261,16 @@ require_once 'includes/admin_header.php';
                                         <?php echo $payment['nom'] ? htmlspecialchars($payment['nom'] . ' ' . $payment['prenom']) : '-'; ?>
                                     <?php endif; ?>
                                 </td>
-                                <td style="color: <?php echo $payment['type_paiement'] === 'entree' ? '#27ae60' : '#e74c3c'; ?>; font-weight: bold;">
+                                <td data-label="Montant" style="color: <?php echo $payment['type_paiement'] === 'entree' ? '#27ae60' : '#e74c3c'; ?>; font-weight: bold;">
                                     <?php echo $payment['type_paiement'] === 'entree' ? '+' : '-'; ?><?php echo formatPrice($payment['montant']); ?>
                                 </td>
-                                <td>
+                                <td data-label="Type">
                                     <span class="badge badge-<?php echo $payment['type_paiement'] === 'entree' ? 'success' : 'danger'; ?>">
                                         <?php echo ucfirst($payment['type_paiement']); ?>
                                     </span>
                                 </td>
-                                <td><?php echo ucfirst(str_replace('_', ' ', $payment['mode_paiement'])); ?></td>
-                                <td><?php echo htmlspecialchars($payment['description'] ?? '-'); ?></td>
+                                <td data-label="Mode"><?php echo ucfirst(str_replace('_', ' ', $payment['mode_paiement'])); ?></td>
+                                <td data-label="Motif"><?php echo htmlspecialchars($payment['description'] ?? '-'); ?></td>
                             </tr>
                             <?php endwhile; ?>
                         <?php else: ?>

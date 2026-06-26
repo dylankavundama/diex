@@ -67,17 +67,21 @@ $categories_result = $conn->query($categories_query);
         <h1 class="section-title">Notre Boutique</h1>
         
         <div class="shop-filters">
-            <form method="GET" action="" class="filter-form">
+            <form method="GET" action="" class="filter-form" id="shopFilterForm">
                 <div class="filter-group">
                     <label>Recherche</label>
-                    <input type="text" name="search" class="form-control" placeholder="Rechercher un produit..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input type="text" name="search" id="shopSearch" class="form-control" placeholder="Rechercher un produit..." value="<?php echo htmlspecialchars($search); ?>">
                 </div>
                 
                 <div class="filter-group">
                     <label>Catégorie</label>
-                    <select name="categorie" class="form-control">
+                    <select name="categorie" id="shopCategory" class="form-control">
                         <option value="">Toutes les catégories</option>
-                        <?php while ($cat = $categories_result->fetch_assoc()): ?>
+                        <?php 
+                        // Reset categories result pointer
+                        $categories_result->data_seek(0);
+                        while ($cat = $categories_result->fetch_assoc()): 
+                        ?>
                             <option value="<?php echo $cat['id']; ?>" <?php echo $categorie_id == $cat['id'] ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($cat['nom']); ?>
                             </option>
@@ -87,23 +91,30 @@ $categories_result = $conn->query($categories_query);
                 
                 <div class="filter-group">
                     <label>Prix minimum</label>
-                    <input type="number" name="min_price" class="form-control" placeholder="0" value="<?php echo $min_price; ?>" min="0">
+                    <input type="number" name="min_price" id="minPrice" class="form-control" placeholder="0" value="<?php echo $min_price > 0 ? $min_price : ''; ?>" min="0">
                 </div>
                 
                 <div class="filter-group">
                     <label>Prix maximum</label>
-                    <input type="number" name="max_price" class="form-control" placeholder="100000" value="<?php echo $max_price; ?>" min="0">
+                    <input type="number" name="max_price" id="maxPrice" class="form-control" placeholder="Max" value="<?php echo $max_price > 0 ? $max_price : ''; ?>" min="0">
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Filtrer</button>
                 <a href="shop.php" class="btn btn-secondary">Réinitialiser</a>
             </form>
         </div>
         
-        <div class="products-grid">
+        <div id="noResults" style="display: none; text-align: center; padding: 5rem; grid-column: 1 / -1; width: 100%;">
+            <i class="fas fa-search" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+            <p style="font-size: 1.2rem; color: #666;">Aucun produit ne correspond à vos critères.</p>
+        </div>
+
+        <div class="products-grid" id="shopProductsGrid">
             <?php if ($products_result->num_rows > 0): ?>
                 <?php while ($product = $products_result->fetch_assoc()): ?>
-                    <div class="product-card">
+                    <div class="product-card" 
+                         data-name="<?php echo htmlspecialchars(strtolower($product['nom'])); ?>" 
+                         data-category="<?php echo $product['categorie_id']; ?>" 
+                         data-price="<?php echo $product['prix_vente']; ?>">
                         <a href="product.php?id=<?php echo $product['id']; ?>">
                             <div class="product-image">
                                 <?php if ($product['image_principale']): ?>
@@ -128,26 +139,85 @@ $categories_result = $conn->query($categories_query);
                 <?php endwhile; ?>
             <?php else: ?>
                 <div class="text-center" style="grid-column: 1 / -1; padding: 3rem;">
-                    <p>Aucun produit trouvé avec ces critères.</p>
+                    <p>Aucun produit disponible pour le moment.</p>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 </section>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const shopSearch = document.getElementById('shopSearch');
+    const shopCategory = document.getElementById('shopCategory');
+    const minPriceInput = document.getElementById('minPrice');
+    const maxPriceInput = document.getElementById('maxPrice');
+    const productCards = document.querySelectorAll('.product-card');
+    const noResults = document.getElementById('noResults');
+    const productsGrid = document.getElementById('shopProductsGrid');
+
+    function filterProducts() {
+        const searchQuery = shopSearch.value.toLowerCase().trim();
+        const selectedCat = shopCategory.value;
+        const minPrice = parseFloat(minPriceInput.value) || 0;
+        const maxPrice = parseFloat(maxPriceInput.value) || Infinity;
+
+        let visibleCount = 0;
+
+        productCards.forEach(card => {
+            const name = card.getAttribute('data-name');
+            const catId = card.getAttribute('data-category');
+            const price = parseFloat(card.getAttribute('data-price'));
+
+            const matchesSearch = name.includes(searchQuery);
+            const matchesCat = selectedCat === '' || catId === selectedCat;
+            const matchesPrice = price >= minPrice && price <= maxPrice;
+
+            if (matchesSearch && matchesCat && matchesPrice) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0 && productCards.length > 0) {
+            noResults.style.display = 'block';
+            productsGrid.style.display = 'none';
+        } else {
+            noResults.style.display = 'none';
+            productsGrid.style.display = 'grid';
+        }
+    }
+
+    [shopSearch, shopCategory, minPriceInput, maxPriceInput].forEach(el => {
+        if (el) {
+            el.addEventListener('input', filterProducts);
+            if (el.tagName === 'SELECT') {
+                el.addEventListener('change', filterProducts);
+            }
+        }
+    });
+
+    // Initial check (in case filters were set via URL)
+    filterProducts();
+});
+</script>
+
 <style>
 .shop-filters {
-    background: var(--white);
+    background: white;
     padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     margin-bottom: 3rem;
+    border: 1px solid #eee;
 }
 
 .filter-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: end;
 }
 
@@ -155,7 +225,25 @@ $categories_result = $conn->query($categories_query);
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: #2c3e50;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid #eee;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 </style>
 

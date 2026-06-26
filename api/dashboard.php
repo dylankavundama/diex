@@ -14,14 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once '../config/config.php';
 require_once '../config/database.php';
+require_once 'auth_check.php';
 
 // Vérifier l'authentification
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Non authentifié']);
-    exit();
-}
+verifyApiAuth();
 
 $role = $_GET['role'] ?? $_SESSION['user_role'];
 $conn = getDBConnection();
@@ -79,7 +75,10 @@ if ($role === 'admin') {
 
 echo json_encode([
     'success' => true,
-    'data' => $stats
+    'data' => $stats,
+    'config' => [
+        'usd_to_cdf_rate' => USD_TO_CDF_RATE
+    ]
 ]);
 
 $conn->close();

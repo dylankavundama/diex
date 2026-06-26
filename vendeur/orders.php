@@ -72,14 +72,14 @@ require_once 'includes/vendeur_header.php';
                 <?php if ($orders->num_rows > 0): ?>
                     <?php while ($order = $orders->fetch_assoc()): ?>
                         <tr>
-                            <td><strong><?php echo htmlspecialchars($order['numero_commande']); ?></strong></td>
-                            <td><?php echo htmlspecialchars($order['nom'] . ' ' . $order['prenom']); ?></td>
-                            <td>
+                            <td data-label="N° Commande"><strong><?php echo htmlspecialchars($order['numero_commande']); ?></strong></td>
+                            <td data-label="Client"><?php echo htmlspecialchars($order['nom'] . ' ' . $order['prenom']); ?></td>
+                            <td data-label="Contact">
                                 <div><?php echo htmlspecialchars($order['email']); ?></div>
                                 <small><?php echo htmlspecialchars($order['telephone']); ?></small>
                             </td>
-                            <td><strong><?php echo formatPrice($order['total']); ?></strong></td>
-                            <td>
+                            <td data-label="Total"><strong><?php echo formatPrice($order['total']); ?></strong></td>
+                            <td data-label="Statut">
                                 <span class="badge badge-<?php 
                                     echo $order['statut'] == 'livree' ? 'success' : 
                                         ($order['statut'] == 'en_attente' ? 'warning' : '');
@@ -87,9 +87,9 @@ require_once 'includes/vendeur_header.php';
                                     <?php echo ucfirst(str_replace('_', ' ', $order['statut'])); ?>
                                 </span>
                             </td>
-                            <td><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></td>
-                            <td>
-                                <a href="invoice.php?id=<?php echo $order['id']; ?>" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                            <td data-label="Date"><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></td>
+                            <td data-label="Actions">
+                                <a href="invoice.php?id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">
                                     <i class="fas fa-file-invoice"></i> Facture
                                 </a>
                             </td>

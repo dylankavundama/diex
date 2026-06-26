@@ -127,8 +127,8 @@ require_once 'includes/vendeur_header.php';
                     <?php if ($top_products->num_rows > 0): ?>
                         <?php while ($product = $top_products->fetch_assoc()): ?>
                             <tr>
-                                <td><strong><?php echo htmlspecialchars($product['nom']); ?></strong></td>
-                                <td><strong><?php echo $product['total_vendu']; ?></strong> unités</td>
+                                <td data-label="Produit"><strong><?php echo htmlspecialchars($product['nom']); ?></strong></td>
+                                <td data-label="Quantité vendue"><strong><?php echo $product['total_vendu']; ?></strong> unités</td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>

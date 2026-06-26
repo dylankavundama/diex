@@ -86,11 +86,11 @@ require_once 'includes/admin_header.php';
                     <?php if ($users->num_rows > 0): ?>
                         <?php while ($user = $users->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo $user['id']; ?></td>
-                            <td><?php echo htmlspecialchars($user['nom'] . ' ' . $user['prenom']); ?></td>
-                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                            <td><?php echo htmlspecialchars($user['telephone'] ?? '-'); ?></td>
-                            <td>
+                            <td data-label="ID"><?php echo $user['id']; ?></td>
+                            <td data-label="Nom"><?php echo htmlspecialchars($user['nom'] . ' ' . $user['prenom']); ?></td>
+                            <td data-label="Email"><?php echo htmlspecialchars($user['email']); ?></td>
+                            <td data-label="Téléphone"><?php echo htmlspecialchars($user['telephone'] ?? '-'); ?></td>
+                            <td data-label="Rôle">
                                 <span class="badge badge-<?php 
                                     echo $user['role'] === 'admin' ? 'danger' : 
                                         ($user['role'] === 'vendeur' ? 'warning' : '');
@@ -98,22 +98,21 @@ require_once 'includes/admin_header.php';
                                     <?php echo ucfirst($user['role']); ?>
                                 </span>
                             </td>
-                            <td>
+                            <td data-label="Statut">
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <input type="hidden" name="action" value="update_status">
-                                    <select name="statut" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 5px;">
+                                    <select name="statut" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 5px; width: 100%;">
                                         <option value="actif" <?php echo $user['statut'] === 'actif' ? 'selected' : ''; ?>>Actif</option>
                                         <option value="inactif" <?php echo $user['statut'] === 'inactif' ? 'selected' : ''; ?>>Inactif</option>
                                     </select>
                                 </form>
                             </td>
-                            <td><?php echo date('d/m/Y', strtotime($user['created_at'])); ?></td>
-                            <td>
+                            <td data-label="Date création"><?php echo date('d/m/Y', strtotime($user['created_at'])); ?></td>
+                            <td data-label="Actions">
                                 <?php if ($user['id'] != $_SESSION['user_id']): ?>
                                     <a href="?action=delete&id=<?php echo $user['id']; ?>" 
-                                       class="btn btn-danger" 
-                                       style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+                                       class="btn btn-danger btn-sm" 
                                        onclick="return confirm('Êtes-vous sûr ?');">Supprimer</a>
                                 <?php endif; ?>
                             </td>
